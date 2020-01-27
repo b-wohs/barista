@@ -63,6 +63,7 @@ import { DtThemingModule } from '@dynatrace/barista-components/theming';
 import { DtExamplesModule } from '@dynatrace/barista-components/examples';
 import { DtToastModule } from '@dynatrace/barista-components/toast';
 import { RouterModule } from '@angular/router';
+import { BaStackblitzService } from './shared/stackblitz.service';
 
 /**
  * Function expressions are not supported in decorators,
@@ -126,6 +127,7 @@ export function BaDummyErrorHandler(): void {}
     BaScrollSpyService,
     BaRecentlyOrderedService,
     BaCopyToClipboardService,
+    BaStackblitzService,
   ],
   entryComponents: [
     BaSinglePage,

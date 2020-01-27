@@ -42,6 +42,7 @@ import {
 import { createComponent } from '../../utils/create-component';
 import { wrapCodeLines } from '../../utils/wrap-code-lines';
 import { BaCopyToClipboardService } from '../../shared/copy-to-clipboard.service';
+import { BaStackblitzService } from '../../shared/stackblitz.service';
 
 type BaSourceType = 'html' | 'ts' | 'scss';
 
@@ -171,6 +172,7 @@ export class BaLiveExample implements OnDestroy {
     private _viewContainerRef: ViewContainerRef,
     private _platform: Platform,
     private _ctcService: BaCopyToClipboardService,
+    private _stackBlitzService: BaStackblitzService,
   ) {
     registerLanguages(TypeScript, XML);
     this._highlighter = init(htmlRender);
@@ -214,6 +216,15 @@ export class BaLiveExample implements OnDestroy {
         this._copySuccess();
       }
     }
+  }
+
+  /** @internal Opens this example in stackblitz. */
+  _openInStackblitz(): void {
+    this._stackBlitzService.openInStackblitz(
+      this.name,
+      this._classSource,
+      this._templateSource,
+    );
   }
 
   private _initExample(): void {
