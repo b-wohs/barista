@@ -25,10 +25,11 @@ import { DtColors } from '@dynatrace/barista-components/theming';
 export class BaColorGrid implements AfterContentInit {
   @Input()
   get color(): string {
-    return this._colorname;
+    return this._colorInput;
   }
   set color(value: string) {
     this._colorname = value.toUpperCase();
+    this._colorInput = value;
   }
 
   /** @internal name of the colorgroup */
@@ -37,11 +38,15 @@ export class BaColorGrid implements AfterContentInit {
   /** @internal name of all colors that should be displayed */
   _allSelectedColors: string[];
 
+  private _colorInput: string;
+
   ngAfterContentInit(): void {
     this._allSelectedColors = Object.keys(DtColors)
       .map((color): string => {
         const parts = color.split('_');
 
+        // return the colors matching the colorname input,
+        // white should be included in a gray colorgrid
         if (
           parts[0] === this._colorname ||
           (this._colorname === 'GRAY' && parts[0] === 'WHITE')
