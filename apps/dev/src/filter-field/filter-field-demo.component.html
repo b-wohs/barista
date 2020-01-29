@@ -40,3 +40,17 @@
     getTagForFilter
   </button>
 </div>
+<hr />
+Example with "RAW" data. Select filter from Operating System and AutoUpdate and
+check console. For Operating System we know which filter category and item was
+selected, but for AutoUpdate we don't know. With variable with types, we can't
+easily add "RAW" data and then there is problem how to get this data from
+formatted name? I would like to have something like "data" property in
+DtFilterFieldDefaultDataSourceSimpleOption and
+DtFilterFieldDefaultDataSourceSimpleGroup interface.
+<dt-filter-field
+  [dataSource]="filterDataSource"
+  (filterChanges)="onFiltersChanged($event)"
+  label="Filters"
+>
+</dt-filter-field>

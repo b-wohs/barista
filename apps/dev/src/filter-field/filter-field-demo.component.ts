@@ -19,8 +19,12 @@ import { Subscription } from 'rxjs';
 
 import {
   DtFilterField,
+  DtFilterFieldChangeEvent,
   DtFilterFieldCurrentFilterChangeEvent,
   DtFilterFieldDefaultDataSource,
+  DtFilterFieldDefaultDataSourceAutocomplete,
+  DtFilterFieldDefaultDataSourceOption,
+  DtFilterFieldDefaultDataSourceType,
   DtFilterFieldTag,
 } from '@dynatrace/barista-components/filter-field';
 
@@ -103,6 +107,77 @@ const blaRange = [
   },
 ] as any;
 
+const formatFilterName = (filter: ActiveGateFilter): string => {
+  switch (filter) {
+    case ActiveGateFilter.OS_TYPE:
+      return 'Operating system';
+    case ActiveGateFilter.AUTO_UPDATE:
+      return 'AutoUpdate';
+    default:
+      return 'Unknown filter';
+  }
+};
+
+const formatOsType = (osType: OsType): string => {
+  switch (osType) {
+    case OsType.OS_TYPE_WINDOWS:
+      return 'Windows';
+    case OsType.OS_TYPE_LINUX:
+      return 'Linux';
+    default:
+      return 'Unknown OS';
+  }
+};
+
+enum ActiveGateFilter {
+  OS_TYPE = 'OS_TYPE',
+  AUTO_UPDATE = 'AUTO_UPDATE',
+}
+
+enum OsType {
+  OS_TYPE_WINDOWS = 'OS_TYPE_WINDOWS',
+  OS_TYPE_LINUX = 'OS_TYPE_LINUX',
+}
+
+const osTypeFilterValues =
+  // : DtFilterFieldDefaultDataSourceOption // I would like to keep Types for filter options variables,
+  // but then I can't add "data" property with unformatted value
+  {
+    name: formatFilterName(ActiveGateFilter.OS_TYPE),
+    data: ActiveGateFilter.OS_TYPE, // I would like to pass also "raw" data, not just formatted as for "name" property
+    autocomplete: [
+      {
+        name: formatOsType(OsType.OS_TYPE_LINUX),
+        data: OsType.OS_TYPE_LINUX, // same here -> raw value
+      },
+      {
+        name: formatOsType(OsType.OS_TYPE_WINDOWS),
+        data: OsType.OS_TYPE_WINDOWS, // same here -> raw value
+      },
+    ],
+  };
+
+const autoUpdateFilterValues: DtFilterFieldDefaultDataSourceOption =
+  // here variable is with type -> can't add "data" property
+  {
+    name: formatFilterName(ActiveGateFilter.AUTO_UPDATE),
+    // data: ActiveGateFilter.AUTO_UPDATE, // I would like to pass also "raw" data, not just formatted as for "name" property
+    autocomplete: [
+      {
+        name: 'Enabled',
+        // data: true, // same here -> raw value
+      },
+      {
+        name: 'Disabled',
+        // data: false, // same here -> raw value
+      },
+    ],
+  };
+
+const exampleFilters: DtFilterFieldDefaultDataSourceAutocomplete = {
+  autocomplete: [osTypeFilterValues, autoUpdateFilterValues],
+};
+
 @Component({
   selector: 'filter-field-dev-app-demo',
   templateUrl: './filter-field-demo.component.html',
@@ -132,6 +207,9 @@ export class FilterFieldDemo implements AfterViewInit, OnDestroy {
   _firstTag: DtFilterFieldTag;
 
   _dataSource = new DtFilterFieldDefaultDataSource<any>(TEST_DATA);
+  filterDataSource = new DtFilterFieldDefaultDataSource<
+    DtFilterFieldDefaultDataSourceType
+  >();
   _loading = false;
 
   ngAfterViewInit(): void {
@@ -140,6 +218,9 @@ export class FilterFieldDemo implements AfterViewInit, OnDestroy {
         this._firstTag = tags[0];
       }
     });
+
+    console.log('Provided filters', exampleFilters);
+    this.filterDataSource.data = exampleFilters;
   }
 
   ngOnDestroy(): void {
@@ -208,5 +289,23 @@ export class FilterFieldDemo implements AfterViewInit, OnDestroy {
     rangeTag!.deletable = false;
     const freeTag = this.filterField.getTagForFilter(blaFree);
     freeTag!.editable = false;
+  }
+
+  onFiltersChanged($filter: DtFilterFieldChangeEvent<unknown>): void {
+    console.log('Selected filter', $filter);
+    if ($filter.added.length > 0) {
+      console.log(
+        'Raw filter type:',
+        $filter.added[0][0].data,
+        'Formatted filter type:',
+        $filter.added[0][0].name,
+      );
+      console.log(
+        'Raw filter item:',
+        $filter.added[0][1].data,
+        'Formatted filter item:',
+        $filter.added[0][1].name,
+      );
+    }
   }
 }
